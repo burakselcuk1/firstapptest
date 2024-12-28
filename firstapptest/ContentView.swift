@@ -6,6 +6,24 @@ struct ContentView: View {
     @State private var result = ""
     
     var body: some View {
+        
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 14){
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+                Text("laleler")
+            }.onTapGesture {
+                print("tıklandı")
+            }
+        }
+        
         VStack(spacing: 20) {
             TextField("İlk sayı", text: $firstNumber)
                 .keyboardType(.decimalPad)
