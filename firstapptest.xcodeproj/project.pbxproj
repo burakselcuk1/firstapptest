@@ -29,9 +29,22 @@
 		B262BD162D185F5700F0E8BF /* firstapptestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = firstapptestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B248B2D62D218F8700715619 /* Exceptions for "firstapptest" folder in "firstapptest" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				repository/MovieRepositoryProtocol,
+			);
+			target = B262BCFB2D185F5600F0E8BF /* firstapptest */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B262BCFE2D185F5600F0E8BF /* firstapptest */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B248B2D62D218F8700715619 /* Exceptions for "firstapptest" folder in "firstapptest" target */,
+			);
 			path = firstapptest;
 			sourceTree = "<group>";
 		};
@@ -236,6 +249,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				// ... diğer dosyalar ...
+				// MovieRepositoryProtocol.swift dosyasını ekleyin
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

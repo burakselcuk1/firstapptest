@@ -1,99 +1,124 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var firstNumber = ""
-    @State private var secondNumber = ""
-    @State private var result = ""
+    @StateObject private var viewModel = MovieViewModel()
     
     var body: some View {
-        
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 14){
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-                Text("laleler")
-            }.onTapGesture {
-                print("tıklandı")
-            }
+        NavigationView {
+            MovieListView(viewModel: viewModel)
+                .navigationTitle("Popular Movies")
         }
-        
-        VStack(spacing: 20) {
-            TextField("İlk sayı", text: $firstNumber)
-                .keyboardType(.decimalPad)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            TextField("İkinci sayı", text: $secondNumber)
-                .keyboardType(.decimalPad)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
-            Text("Sonuç: \(result)")
-                .font(.title)
-                .padding()
-            
-            HStack(spacing: 15) {
-                Button("Topla") {
-                    calculate(operation: "+")
-                }
-                .buttonStyle(.bordered)
-                .tint(.blue)
-                
-                Button("Çıkar") {
-                    calculate(operation: "-")
-                }
-                .buttonStyle(.bordered)
-                .tint(.red)
-                
-                Button("Çarp") {
-                    calculate(operation: "×")
-                }
-                .buttonStyle(.bordered)
-                .tint(.green)
-                
-                Button("Böl") {
-                    calculate(operation: "÷")
-                }
-                .buttonStyle(.bordered)
-                .tint(.orange)
-            }
-        }
-        .padding()
-    }
-    
-    func calculate(operation: String) {
-        guard let first = Double(firstNumber),
-              let second = Double(secondNumber) else {
-            result = "Geçerli sayılar girin"
-            return
-        }
-        
-        switch operation {
-        case "+":
-            result = "\(first + second)"
-        case "-":
-            result = "\(first - second)"
-        case "×":
-            result = "\(first * second)"
-        case "÷":
-            if second == 0 {
-                result = "Sıfıra bölünemez"
-            } else {
-                result = "\(first / second)"
-            }
-        default:
-            result = "Hata"
+        .onAppear {
+            viewModel.fetchMovies()
         }
     }
 }
 
+
+struct MovieListView: View {
+    @ObservedObject var viewModel: MovieViewModel
+    
+    let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+    
+    var body: some View {
+        Group {
+            if viewModel.isLoading {
+                ProgressView()
+            } else if let error = viewModel.error {
+                VStack {
+                    Text("Error loading movies")
+                    Text(error.localizedDescription)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                    Button("Retry") {
+                        viewModel.fetchMovies()
+                    }
+                }
+            } else {
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(viewModel.movies) { movie in
+                            NavigationLink(destination: MovieDetailView(movie: movie)) {
+                                MovieCell(movie: movie)
+                            }
+                        }
+                    }
+                    .padding()
+                }
+            }
+        }
+    }
+}
+
+struct MovieCell: View {
+    let movie: Movie
+    
+    var body: some View {
+        VStack {
+            AsyncImage(url: movie.posterURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                ProgressView()
+            }
+            .frame(height: 200)
+            .cornerRadius(8)
+            
+            Text(movie.title)
+                .font(.caption)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
+        }
+    }
+}
+
+struct MovieDetailView: View {
+    let movie: Movie
+    
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                AsyncImage(url: movie.posterURL) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                } placeholder: {
+                    ProgressView()
+                }
+                .frame(maxWidth: .infinity)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(movie.title)
+                        .font(.title)
+                        .fontWeight(.bold)
+                    
+                    HStack {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.yellow)
+                        Text(String(format: "%.1f", movie.voteAverage))
+                        Spacer()
+                        Text(movie.releaseDate)
+                            .foregroundColor(.gray)
+                    }
+                    
+                    Text("Overview")
+                        .font(.headline)
+                        .padding(.top)
+                    
+                    Text(movie.overview)
+                        .font(.body)
+                }
+                .padding()
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
 #Preview {
     ContentView()
 }
